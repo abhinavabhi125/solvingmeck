@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Complain Portal 💌</title>
+  <style>
+    body {
+      background: #ffeef0;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      background: #fff0f5;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #d6336c;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #6c757d;
+      font-weight: bold;
+    }
+
+    textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1.1em;
+    }
+
+    button {
+      width: 100%;
+      background-color: #ff5e78;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 1em;
+      margin-top: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e84a61;
+    }
+
+    .response {
+      margin-top: 20px;
+      font-size: 1.1em;
+      text-align: center;
+    }
+
+    .log {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 30px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    .log h3 {
+      color: #333;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    .entry {
+      padding: 10px;
+      border-bottom: 1px dashed #ddd;
+      margin-bottom: 10px;
+    }
+
+    .entry:last-child {
+      border-bottom: none;
+    }
+
+    .mood {
+      font-size: 1.3em;
+      margin-right: 5px;
+    }
+
+    .message {
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Tell Me What's Bothering You 💗</h2>
+    
+    <label for="complaint">What's bothering you?</label>
+    <textarea id="complaint" rows="4" placeholder="Type here..."></textarea>
+
+    <label for="mood">Pick your mood (emoji):</label>
+    <select id="mood">
+      <option value="">--Choose--</option>
+      <option value="😢">😢</option>
+      <option value="😠">😠</option>
+      <option value="😔">😔</option>
+      <option value="😕">😕</option>
+      <option value="😐">😐</option>
+      <option value="😊">😊</option>
+    </select>
+
+    <button onclick="handleSubmit()">Send 💌</button>
+
+    <div class="response" id="responseMsg"></div>
+
+    <div class="log">
+      <h3>Past Complaints 📝</h3>
+      <div id="logEntries"></div>
+    </div>
+  </div>
+
+  <script>
+    // Load saved entries on page load
+    window.onload = function() {
+      loadEntries();
+    };
+
+    function handleSubmit() {
+      const complaint = document.getElementById("complaint").value.trim();
+      const mood = document.getElementById("mood").value;
+      const responseMsg = document.getElementById("responseMsg");
+
+      if (!complaint || !mood) {
+        responseMsg.innerHTML = "Please write your complaint and choose a mood.";
+        responseMsg.style.color = "#e84a61";
+        return;
+      }
+
+      let reply = "";
+      switch (mood) {
+        case "😢": reply = "It's okay to cry sometimes. I'm here for you. 🤗"; break;
+        case "😠": reply = "Let that anger out, you're not alone 💪"; break;
+        case "😔": reply = "Things might feel heavy now, but you're stronger than you think 💖"; break;
+        case "😕": reply = "Confusion is okay — we'll figure it out together 🌈"; break;
+        case "😐": reply = "Even on 'meh' days, you're still loved 💫"; break;
+        case "😊": reply = "I'm happy you're feeling okay. Keep that smile going! 😄"; break;
+      }
+
+      responseMsg.innerHTML = `${mood} ${reply}`;
+      responseMsg.style.color = "#28a745";
+
+      saveEntry(complaint, mood);
+      document.getElementById("complaint").value = "";
+      document.getElementById("mood").value = "";
+    }
+
+    function saveEntry(complaint, mood) {
+      const entry = { mood, complaint, time: new Date().toLocaleString() };
+      let entries = JSON.parse(localStorage.getItem("complaintEntries")) || [];
+      entries.unshift(entry); // Add to the beginning
+      localStorage.setItem("complaintEntries", JSON.stringify(entries));
+      loadEntries(); // Refresh display
+    }
+
+    function loadEntries() {
+      const logDiv = document.getElementById("logEntries");
+      logDiv.innerHTML = "";
+      const entries = JSON.parse(localStorage.getItem("complaintEntries")) || [];
+
+      if (entries.length === 0) {
+        logDiv.innerHTML = "<p>No complaints yet.</p>";
+        return;
+      }
+
+      entries.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+          <div><span class="mood">${entry.mood}</span> <span class="message">"${entry.complaint}"</span></div>
+          <small style="color:gray;">🕒 ${entry.time}</small>
+        `;
+        logDiv.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
